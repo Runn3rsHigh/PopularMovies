@@ -11,9 +11,9 @@ public class Movie {
     private String posterPath;
     private String overview;
     private String releaseDate;
-    private String rating;
+    private Double rating;
 
-    public Movie(String title, String movieId, String posterPath, String overview, String release_date, String rating){
+    public Movie(String title, String movieId, String posterPath, String overview, String release_date, Double rating){
         this.title = title;
         this.movieId = movieId;
         this.posterPath = posterPath;
@@ -42,7 +42,13 @@ public class Movie {
         return releaseDate;
     }
 
-    public String getRating(){
+    public Double getRating(){
         return rating;
+    }
+
+    @Override
+    public String toString(){
+        String movieString = "Movie: " + title + " ID: " + movieId + " poster_path: " + posterPath + " overview: " + overview + " release_date: " + releaseDate + " rating: " + rating.toString();
+        return movieString;
     }
 }

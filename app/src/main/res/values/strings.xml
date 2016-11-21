@@ -1,7 +1,24 @@
 <resources>
     <string name="app_name">PopularMovies</string>
-    <string name="api_key_string">api_key</string>
+    <string name="api_key_string">@string/api_key</string>
+
+    <string name="settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="default_thumbnail_size">w185</string>
+    <string name="larger_thumbnail_size">w500</string>
+    <string name="base_image_url">http://image.tmdb.org/t/p/</string>
+    <string name="original_image_size">w780</string>
+
+    <!-- Strings for preferences -->
+    <string name="pref_sort">Sorting preference</string>
+    <string name="pref_sort_summary">Change order that movies are displayed</string>
+    <string name="pref_defaultValue">popular</string>
+
+    <!-- Strings for movie details -->
+    <string name="movie_detail_release">Release Date: </string>
+    <string name="movie_detail_rating">Rating: </string>
+
 </resources>

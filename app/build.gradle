@@ -20,6 +20,14 @@ android {
             def apiKey = properties.getProperty('api.key')
             resValue "string", "api_key", apiKey
         }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('release.properties').newDataInputStream())
+            def apiKey = properties.getProperty('api.key')
+            resValue "string", "api_key", apiKey
+        }
     }
 }
 
@@ -30,5 +38,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.volley:volley:1.0.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }
