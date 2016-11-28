@@ -3,10 +3,12 @@ package com.example.kschmidty.popularmovies;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +48,9 @@ public class FragmentDiscovery extends Fragment {
     private StringRequest mStringRequest;
     private List<Movie> mmovies = new ArrayList<Movie>();
     private MovieAdapter mAdapter;
+    private final String KEY_LAST_SCROLL_LOCATION = "lastScrollLocation";
+    private int lastScrollLocation;
+
 
     // Final Strings used for parsing JSON Movie Objects
     private final String TITLE = "original_title";
@@ -61,7 +66,8 @@ public class FragmentDiscovery extends Fragment {
 
     // Other important constants
     private final long DAY_IN_MS = 1000 * 60 * 60 * 24;
-
+    private final String KEY_PREF_SORT_TYPE = "pref_sortType";
+    private String currentSortOrder;
 
 
     public FragmentDiscovery() {
@@ -71,26 +77,16 @@ public class FragmentDiscovery extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG,"onCreate() called");
         setHasOptionsMenu(true);
+
+        setRetainInstance(true);
 
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
-        inflater.inflate(R.menu.menu, menu);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
-            case R.id.settings:
-                Intent intent = new Intent(getActivity().getApplicationContext(),SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return false;
-
-        }
     }
 
     private void getPopularMovies() {
@@ -125,7 +121,47 @@ public class FragmentDiscovery extends Fragment {
     }
 
     private void getTopRatedMovies(){
+        mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        String url = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + getString(R.string.api_key_string) + "&language=en-US";
 
+
+        mStringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // TODO Parse response to JSON
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            createMovies(jsonResponse);
+                        } catch (JSONException e){
+                            Log.e(LOG_TAG,e.toString());
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO handle error response
+                Log.v(LOG_TAG, error.toString());
+            }
+        });
+
+        mRequestQueue.add(mStringRequest);
+        mLastUpdated = new Date();
+    }
+
+    private void getMoviesFromInternet(String sortType){
+        if (sortType.equalsIgnoreCase("popular")){
+            currentSortOrder = "popular";
+            getPopularMovies();
+        }
+        else if (sortType.equalsIgnoreCase("rated")) {
+            currentSortOrder = "rated";
+            getTopRatedMovies();
+        }
+        else {
+            Log.e(LOG_TAG,"Could not find a default sort order");
+        }
     }
 
     /*
@@ -138,7 +174,6 @@ public class FragmentDiscovery extends Fragment {
             JSONArray results = jsonMovies.getJSONArray("results");
             for(int i = 0; i < results.length();i++){
                 JSONObject movieObject = results.getJSONObject(i);
-                Log.v(LOG_TAG,movieObject.toString());
                 Movie movieItem = new Movie(movieObject.getString(TITLE),movieObject.getString(ID),movieObject.getString(POSTER_PATH),
                         movieObject.getString(OVERVIEW),movieObject.getString(RELEASE_DATE),movieObject.getDouble(RATING));
                 mmovies.add(movieItem);
@@ -158,20 +193,27 @@ public class FragmentDiscovery extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.v(LOG_TAG,"onCreateView() called");
+
         FrameLayout mGridLayout = (FrameLayout) inflater.inflate(R.layout.fragment_discovery, container,false);
         mGridView = (GridView) mGridLayout.findViewById(R.id.grid_view);
         mAdapter = new MovieAdapter(getActivity().getApplicationContext(),R.layout.fragment_discovery,mmovies);
         mGridView.setAdapter(mAdapter);
 
+        // Date for checking last time data was updated
         Date fiveDaysAgo = new Date(System.currentTimeMillis() - (5 * DAY_IN_MS));
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        currentSortOrder = sharedPref.getString(KEY_PREF_SORT_TYPE, getString(R.string.pref_sort_defaultValue));
+
 
         if (mLastUpdated != null){
            if (mLastUpdated.before(fiveDaysAgo)){
                mmovies.clear();
-               getPopularMovies();
+               getMoviesFromInternet(currentSortOrder);
            }
         }else{
-            getPopularMovies();
+            getMoviesFromInternet(currentSortOrder);
         }
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -204,8 +246,42 @@ public class FragmentDiscovery extends Fragment {
     @Override
     public void onStop(){
         super.onStop();
+        Log.v(LOG_TAG,"onStop() called");
+    }
 
-        Log.v(LOG_TAG,"onStop called");
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.v(LOG_TAG,"onPause() called");
+
+        lastScrollLocation = mGridView.getFirstVisiblePosition();
+        Log.v(LOG_TAG,"Setting lastScrollLocation -> " + lastScrollLocation);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+       super.onSaveInstanceState(outState);
+        outState.putInt("lastScrollLocation",lastScrollLocation);
+        Log.v(LOG_TAG,"onSaveInstancestate() called");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.v(LOG_TAG,"onResume() called");
+        Log.v(LOG_TAG,"lastScrollLocation: " + lastScrollLocation);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String preferenceOrder = sharedPref.getString(KEY_PREF_SORT_TYPE, getString(R.string.pref_sort_defaultValue));
+
+        // If the sort order was updated, then pull the new sorted content from the MovieDB
+        if(!preferenceOrder.equalsIgnoreCase(currentSortOrder)){
+            mmovies.clear();
+            getMoviesFromInternet(preferenceOrder);
+        }
+        else {
+            mGridView.smoothScrollToPosition(lastScrollLocation);
+        }
+
     }
 
 

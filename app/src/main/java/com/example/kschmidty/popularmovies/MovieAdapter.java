@@ -33,36 +33,35 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
         this.movies = objects;
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
-        Log.v(LOG_TAG, "MovieAdapter Constructor called");
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        ImageView view;
+        ViewHolder holder;
         if ( null == convertView){
-            Log.v(LOG_TAG, "convertView is null");
-            view = new ImageView(context);
-            view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT,GridView.LayoutParams.MATCH_PARENT));
-            view.setScaleType(ImageView.ScaleType.CENTER);
-            view.setPadding(1,1,1,1);
-        } else {
-            Log.v(LOG_TAG, "reusing previous convertView");
-            view = (ImageView) convertView;
+            convertView = layoutInflater.inflate(R.layout.image_view_item,parent,false);
+            holder = new ViewHolder();
+
+            holder.image = (ImageView) convertView;
+            convertView.setTag(holder);
+        }else{
+            holder = (ViewHolder) convertView.getTag();
         }
 
-
         String poster_path = context.getString(R.string.base_image_url) + context.getString(R.string.larger_thumbnail_size) + movies.get(position).getPosterPath();
-        Log.v(LOG_TAG,"Post Path: "+poster_path);
-
 
         Picasso
                 .with(context)
                 .load(poster_path)
-                .into(view);
+                .into(holder.image);
 
-        return view;
+        return convertView;
 
+    }
+
+    static class ViewHolder {
+        ImageView image;
     }
 
 }
