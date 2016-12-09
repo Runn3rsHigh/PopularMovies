@@ -1,26 +1,18 @@
 package com.example.kschmidty.popularmovies;
 
-import android.app.FragmentManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,12 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 public class FragmentDiscovery extends Fragment {
@@ -89,7 +78,11 @@ public class FragmentDiscovery extends Fragment {
 
     }
 
+
     private void getPopularMovies() {
+        if (!((MainDiscoveryActivity)getActivity()).isOnline()) {
+            return;
+        }
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "https://api.themoviedb.org/3/movie/popular?api_key=" + getString(R.string.api_key_string) + "&language=en-US";
 
@@ -121,6 +114,9 @@ public class FragmentDiscovery extends Fragment {
     }
 
     private void getTopRatedMovies(){
+        if (!((MainDiscoveryActivity)getActivity()).isOnline()){
+            return;
+        }
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         String url = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + getString(R.string.api_key_string) + "&language=en-US";
 

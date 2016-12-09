@@ -1,7 +1,6 @@
 package com.example.kschmidty.popularmovies;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -14,13 +13,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by Runn3rsHigh on 11/13/16.
  */
 
-public class FragmentMovieDetail extends Fragment {
+public class  FragmentMovieDetail extends Fragment {
     public FragmentMovieDetail(){
 
     }
