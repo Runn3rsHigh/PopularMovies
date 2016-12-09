@@ -1,6 +1,6 @@
 # PopularMovies
 
-This project will need an api from https://www.themoviedb.org/ to function.
+This project will need an api key from https://www.themoviedb.org/ to function.
 
 Step one:
 
