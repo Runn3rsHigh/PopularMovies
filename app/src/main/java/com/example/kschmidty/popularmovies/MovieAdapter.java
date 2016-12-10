@@ -19,7 +19,7 @@ import java.util.List;
  * Created by kschm on 10/30/2016.
  */
 
-public class MovieAdapter extends ArrayAdapter<Movie> {
+public class MovieAdapter exte nds ArrayAdapter<Movie> {
 
     private final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
