@@ -19,14 +19,13 @@ import java.util.List;
  * Created by kschm on 10/30/2016.
  */
 
-public class MovieAdapter exte nds ArrayAdapter<Movie> {
+public class MovieAdapter extends ArrayAdapter<Movie> {
 
     private final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
     private Context context;
     private LayoutInflater layoutInflater;
     private List<Movie> movies;
-    private Layout grid_view;
 
     public MovieAdapter(Context context,int resource, List<Movie> objects) {
         super(context, resource, objects);
@@ -42,7 +41,6 @@ public class MovieAdapter exte nds ArrayAdapter<Movie> {
         if ( null == convertView){
             convertView = layoutInflater.inflate(R.layout.image_view_item,parent,false);
             holder = new ViewHolder();
-
             holder.image = (ImageView) convertView;
             convertView.setTag(holder);
         }else{

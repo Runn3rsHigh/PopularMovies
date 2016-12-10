@@ -37,7 +37,6 @@ public class FragmentDiscovery extends Fragment {
     private StringRequest mStringRequest;
     private List<Movie> mmovies = new ArrayList<Movie>();
     private MovieAdapter mAdapter;
-    private final String KEY_LAST_SCROLL_LOCATION = "lastScrollLocation";
     private int lastScrollLocation;
 
 
@@ -84,7 +83,14 @@ public class FragmentDiscovery extends Fragment {
             return;
         }
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "https://api.themoviedb.org/3/movie/popular?api_key=" + getString(R.string.api_key_string) + "&language=en-US";
+        String url = getString(R.string.base_movie_url) +
+                getString(R.string.api_call_popular) +
+                getString(R.string.api_query) +
+                getString(R.string.api_key_string) +
+                getString(R.string.api_key_value)+
+                getString(R.string.api_language);
+
+        Log.v(LOG_TAG,url);
 
 
         mStringRequest = new StringRequest(Request.Method.GET, url,
@@ -118,7 +124,14 @@ public class FragmentDiscovery extends Fragment {
             return;
         }
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        String url = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + getString(R.string.api_key_string) + "&language=en-US";
+        String url = getString(R.string.base_movie_url) +
+                getString(R.string.api_call_topRated) +
+                getString(R.string.api_query) +
+                getString(R.string.api_key_string) +
+                getString(R.string.api_key_value) +
+                getString(R.string.api_language);
+
+        Log.v(LOG_TAG,url);
 
 
         mStringRequest = new StringRequest(Request.Method.GET, url,
